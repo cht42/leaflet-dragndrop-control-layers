@@ -1,0 +1,94 @@
+<html>
+  <head>
+    <!-- Leaflet (v1.7.1)  -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"
+      integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css"
+      integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <!-- Sortable JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <!-- OrderLayers control -->
+    <script src="src/leaflet.control.orderlayers.js"></script>
+    <link rel="stylesheet" href="src/css/leaflet.control.orderlayers.css" />
+  </head>
+
+  <body style="margin: 0">
+    <div id="map" style="height: 100vh; width: 100vw"></div>
+  </body>
+
+  <script>
+    (function (global) {
+      var MarkerMixin = {
+        _updateZIndex: function (offset) {
+          this._icon.style.zIndex = this.options.zIndex
+            ? this.options.zIndex + (this.options.zIndexOffset || 0)
+            : this._zIndex + offset;
+        },
+        setZIndex: function (forceZIndex) {
+          this.options.zIndex = forceZIndex ? forceZIndex : null;
+        },
+      };
+      if (global) global.include(MarkerMixin);
+    })(L.Marker);
+  </script>
+
+  <script>
+    var map = L.map("map").setView([4.598056, -74.075833], 13);
+
+    var baseLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution:
+        'Map data: &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      maxZoom: 20,
+    }).addTo(map);
+
+    var baseLayers = {
+      "OpenStreet Map": baseLayer,
+    };
+
+    var overlayLayers = {
+      Cities: L.layerGroup([
+        L.marker([39.61, -105.02]).bindPopup("Littleton, CO."),
+        L.marker([39.74, -104.99]).bindPopup("Denver, CO."),
+        L.marker([39.73, -104.8]).bindPopup("Aurora, CO."),
+        L.marker([39.77, -105.23]).bindPopup("Golden, CO."),
+      ]).addTo(map),
+      Restaurants: L.layerGroup([
+        L.marker([39.69, -104.85]).bindPopup("A restaurant"),
+        L.marker([39.69, -105.12]).bindPopup("A restaurant"),
+      ]),
+      Satellite: L.tileLayer(
+        "http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        {
+          maxZoom: 18,
+          attribution: '&copy; <a href="http://www.esri.com/">Esri</a>',
+        }
+      ),
+      Terrain: L.tileLayer("https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png", {
+        maxZoom: 18,
+        subdomains: "abcd",
+        attribution:
+          'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      }),
+    };
+
+    var controls = L.control.orderlayers(baseLayers, overlayLayers, {
+      collapsed: false,
+      hideSingleBase: true,
+      dragging: true,
+    });
+    controls.addTo(map);
+
+    map.setView([39.73, -104.99], 11);
+
+    map.on("changelayers", () => console.log(map._layers));
+  </script>
+</html>
