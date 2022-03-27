@@ -29,12 +29,15 @@
     (function (global) {
       var MarkerMixin = {
         _updateZIndex: function (offset) {
-          this._icon.style.zIndex = this.options.zIndex
-            ? this.options.zIndex + (this.options.zIndexOffset || 0)
-            : this._zIndex + offset;
+          if (this._icon) {
+            this._icon.style.zIndex = this.options.zIndex
+              ? this.options.zIndex + (this.options.zIndexOffset || 0)
+              : this._zIndex + offset;
+          }
         },
         setZIndex: function (forceZIndex) {
           this.options.zIndex = forceZIndex ? forceZIndex : null;
+          this._updateZIndex(0);
         },
       };
       if (global) global.include(MarkerMixin);
@@ -43,6 +46,9 @@
 
   <script>
     var map = L.map("map").setView([4.598056, -74.075833], 13);
+
+    map.createPane("custom");
+    map.getPane("custom").style.zIndex = 800;
 
     var baseLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution:
@@ -56,20 +62,21 @@
 
     var overlayLayers = {
       Cities: L.layerGroup([
-        L.marker([39.61, -105.02]).bindPopup("Littleton, CO."),
-        L.marker([39.74, -104.99]).bindPopup("Denver, CO."),
-        L.marker([39.73, -104.8]).bindPopup("Aurora, CO."),
-        L.marker([39.77, -105.23]).bindPopup("Golden, CO."),
-      ]).addTo(map),
+        L.marker([39.61, -105.02], { pane: "custom" }).bindPopup("Littleton, CO."),
+        L.marker([39.74, -104.99], { pane: "custom" }).bindPopup("Denver, CO."),
+        L.marker([39.73, -104.81], { pane: "custom" }).bindPopup("Aurora, CO."),
+        L.marker([39.77, -105.23], { pane: "custom" }).bindPopup("Golden, CO."),
+      ]),
       Restaurants: L.layerGroup([
-        L.marker([39.69, -104.85]).bindPopup("A restaurant"),
-        L.marker([39.69, -105.12]).bindPopup("A restaurant"),
+        L.marker([39.69, -104.85], { pane: "custom" }).bindPopup("A restaurant"),
+        L.marker([39.69, -105.12], { pane: "custom" }).bindPopup("A restaurant"),
       ]),
       Satellite: L.tileLayer(
         "http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
         {
           maxZoom: 18,
           attribution: '&copy; <a href="http://www.esri.com/">Esri</a>',
+          pane: "custom",
         }
       ),
       Terrain: L.tileLayer("https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png", {
@@ -77,6 +84,7 @@
         subdomains: "abcd",
         attribution:
           'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        pane: "custom",
       }),
     };
 

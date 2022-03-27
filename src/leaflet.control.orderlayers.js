@@ -11,14 +11,17 @@ L.Control.OrderLayers = L.Control.Layers.extend({
     var self = this;
     Sortable.create(this._overlaysList, {
       animation: 150,
-      onMove: function (evt, originalEvent) {
+      onMove: (evt, originalEvent) => {
         var objDragged = self._getLayer(evt.dragged.layerId);
         var objRelated = self._getLayer(evt.related.layerId);
         var zIndexDragged = self._getZIndex(objDragged);
         var zIndexRelated = self._getZIndex(objRelated);
         objDragged.layer.setZIndex(zIndexRelated);
         objRelated.layer.setZIndex(zIndexDragged);
+      },
+      onEnd: (evt) => {
         self._map.fire("changelayers");
+        self._update();
       },
     });
   },
